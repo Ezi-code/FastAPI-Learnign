@@ -1,19 +1,36 @@
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from datetime import date
 
+
 class BandsURLData(Enum):
-    ROCK = 'rock'
-    ELECTRIC = 'electric'
-    JAZZ = 'jazz'
-    
+    ROCK = "rock"
+    ELECTRIC = "electric"
+    JAZZ = "jazz"
+
+
+class GenreChoices(Enum):
+    ROCK = "Rock"
+    ELECTRIC = "Electric"
+    JAZZ = "Jazz"
+
 
 class Album(BaseModel):
     title: str
     date: date
 
-class Band(BaseModel):
-    id : int
+
+class BandBase(BaseModel):
     name: str
-    genre: str
-    album: Album
+    genre: GenreChoices
+    album: list[Album] = []
+
+
+class BandCreate(BandBase):
+    @field_validator("genre")
+    def create_genre_title(cls, value):
+        return value
+
+
+class BandWithID(BandBase):
+    id: int
